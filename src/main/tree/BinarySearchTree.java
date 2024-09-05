@@ -21,7 +21,7 @@ public class BinarySearchTree {
         root = null;
     }
 
-    // Método para inserir um elemento na árvore
+    
     public void insereElemento(int valor) {
         root = insereRecursivo(root, valor);
     }
@@ -41,7 +41,7 @@ public class BinarySearchTree {
         return root;
     }
 
-    // Método para remover um elemento da árvore
+    
     public void remove(int valor) {
         root = removeRecursivo(root, valor);
     }
@@ -56,14 +56,14 @@ public class BinarySearchTree {
         } else if (valor > root.value) {
             root.right = removeRecursivo(root.right, valor);
         } else {
-            // Nó com um ou nenhum filho
+            
             if (root.left == null) {
                 return root.right;
             } else if (root.right == null) {
                 return root.left;
             }
 
-            // Nó com dois filhos: pegar o menor no lado direito (sucessor)
+            
             root.value = minValor(root.right);
             root.right = removeRecursivo(root.right, root.value);
         }
@@ -80,7 +80,7 @@ public class BinarySearchTree {
         return minValue;
     }
 
-    // Método de busca de elemento
+    
     public boolean buscaElemento(int valor) {
         return buscaRecursiva(root, valor);
     }
@@ -95,7 +95,7 @@ public class BinarySearchTree {
         return valor < root.value ? buscaRecursiva(root.left, valor) : buscaRecursiva(root.right, valor);
     }
 
-    // Métodos para realizar as travessias (em ordem, pré-ordem, pós-ordem)
+    
 
     public int[] emOrdem() {
         List<Integer> result = new ArrayList<>();
