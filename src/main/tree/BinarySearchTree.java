@@ -8,11 +8,12 @@ public class BinarySearchTree {
     private Node root;
 
     private class Node {
-        int value;
+        int value, height;
         Node left, right;
 
         Node(int value) {
             this.value = value;
+            height = 1; 
             left = right = null;
         }
     }
@@ -21,121 +22,84 @@ public class BinarySearchTree {
         root = null;
     }
 
-    
+    private int getAltura(Node node) {
+        if (node == null) {
+            return 0;
+        }
+        return node.height;
+    }
+
+    private int getBalance(Node node) {
+        if (node == null) {
+            return 0;
+        }
+        return getAltura(node.left) - getAltura(node.right);
+    }
+
     public void insereElemento(int valor) {
         root = insereRecursivo(root, valor);
     }
 
     private Node insereRecursivo(Node root, int valor) {
         if (root == null) {
-            root = new Node(valor);
-            return root;
+            return new Node(valor);
         }
 
         if (valor < root.value) {
             root.left = insereRecursivo(root.left, valor);
         } else if (valor > root.value) {
             root.right = insereRecursivo(root.right, valor);
-        }
-
-        return root;
-    }
-
-    
-    public void remove(int valor) {
-        root = removeRecursivo(root, valor);
-    }
-
-    private Node removeRecursivo(Node root, int valor) {
-        if (root == null) {
-            return null;
-        }
-
-        if (valor < root.value) {
-            root.left = removeRecursivo(root.left, valor);
-        } else if (valor > root.value) {
-            root.right = removeRecursivo(root.right, valor);
         } else {
-            
-            if (root.left == null) {
-                return root.right;
-            } else if (root.right == null) {
-                return root.left;
-            }
+            return root; 
+        }
 
-            
-            root.value = minValor(root.right);
-            root.right = removeRecursivo(root.right, root.value);
+        root.height = 1 + Math.max(getAltura(root.left), getAltura(root.right));
+        
+        int balance = getBalance(root);
+
+        if (balance > 1 && valor < root.left.value) {
+            return rotacaoDireita(root);
+        }
+
+        if (balance < -1 && valor > root.right.value) {
+            return rotacaoEsquerda(root);
+        }
+
+        if (balance > 1 && valor > root.left.value) {
+            root.left = rotacaoEsquerda(root.left);
+            return rotacaoDireita(root);
+        }
+
+        if (balance < -1 && valor < root.right.value) {
+            root.right = rotacaoDireita(root.right);
+            return rotacaoEsquerda(root);
         }
 
         return root;
     }
 
-    private int minValor(Node root) {
-        int minValue = root.value;
-        while (root.left != null) {
-            minValue = root.left.value;
-            root = root.left;
-        }
-        return minValue;
-    }
-
     
-    public boolean buscaElemento(int valor) {
-        return buscaRecursiva(root, valor);
+    private Node rotacaoDireita(Node y) {
+        Node x = y.left;
+        Node T2 = x.right;
+
+        x.right = y;
+        y.left = T2;
+
+        y.height = Math.max(getAltura(y.left), getAltura(y.right)) + 1;
+        x.height = Math.max(getAltura(x.left), getAltura(x.right)) + 1;
+
+        return x;
     }
+    private Node rotacaoEsquerda(Node x) {
+        Node y = x.right;
+        Node T2 = y.left;
 
-    private boolean buscaRecursiva(Node root, int valor) {
-        if (root == null) {
-            return false;
-        }
-        if (root.value == valor) {
-            return true;
-        }
-        return valor < root.value ? buscaRecursiva(root.left, valor) : buscaRecursiva(root.right, valor);
-    }
+        y.left = x;
+        x.right = T2;
+        x.height = Math.max(getAltura(x.left), getAltura(x.right)) + 1;
+        y.height = Math.max(getAltura(y.left), getAltura(y.right)) + 1;
 
-    
-
-    public int[] emOrdem() {
-        List<Integer> result = new ArrayList<>();
-        emOrdemRecursiva(root, result);
-        return result.stream().mapToInt(i -> i).toArray();
-    }
-
-    private void emOrdemRecursiva(Node root, List<Integer> result) {
-        if (root != null) {
-            emOrdemRecursiva(root.left, result);
-            result.add(root.value);
-            emOrdemRecursiva(root.right, result);
-        }
-    }
-
-    public int[] preOrdem() {
-        List<Integer> result = new ArrayList<>();
-        preOrdemRecursiva(root, result);
-        return result.stream().mapToInt(i -> i).toArray();
-    }
-
-    private void preOrdemRecursiva(Node root, List<Integer> result) {
-        if (root != null) {
-            result.add(root.value);
-            preOrdemRecursiva(root.left, result);
-            preOrdemRecursiva(root.right, result);
-        }
-    }
-
-    public int[] posOrdem() {
-        List<Integer> result = new ArrayList<>();
-        posOrdemRecursiva(root, result);
-        return result.stream().mapToInt(i -> i).toArray();
-    }
-
-    private void posOrdemRecursiva(Node root, List<Integer> result) {
-        if (root != null) {
-            posOrdemRecursiva(root.left, result);
-            posOrdemRecursiva(root.right, result);
-            result.add(root.value);
-        }
+        return y;
     }
 }
